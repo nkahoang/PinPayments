@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Configuration;
 
 namespace PinPayments.Infrastructure
 {
@@ -48,9 +47,9 @@ namespace PinPayments.Infrastructure
             get { return BaseUrl + "/1/charges/{token}/refunds"; }
         }
 
-        private static string BaseUrl
+        public static string BaseUrl
         {
-            get { return ConfigurationManager.AppSettings["URI"]; }
+            get; set;
         }
     }
 }

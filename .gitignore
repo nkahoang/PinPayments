@@ -216,3 +216,5 @@ pip-log.txt
 
 #App config has api keys
 PinPayments.Console/app.config
+PinPayments.Console/appsettings.development.json
+*.userprefs

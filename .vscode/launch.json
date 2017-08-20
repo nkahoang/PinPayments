@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (console)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceRoot}/PinPayments.Console/bin/Debug/netcoreapp1.1/PinPayments.Console.dll",
+      "args": [],
+      "cwd": "${workspaceRoot}/PinPayments.Console",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    }
+  ]
+}

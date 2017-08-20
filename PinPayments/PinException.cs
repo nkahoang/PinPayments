@@ -8,7 +8,7 @@ using PinPayments.Models;
 namespace PinPayments
 {
     [Serializable]
-    public class PinException : ApplicationException
+    public class PinException : Exception
     {
         public HttpStatusCode HttpStatusCode { get; set; }
         public PinError PinError { get; set; }

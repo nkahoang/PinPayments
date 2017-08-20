@@ -1,44 +1,90 @@
-PinPayments Library
-==========
+# PinPayments Library for .NET Core
 
-The PinPayments Library is a .net wrapper for http://pin.net.au. 
+The PinPayments Library is a .NET Core wrapper for http://pin.net.au, compatible with .NET Standard 1.6+
+
+This was a fork on the [original repo by cpayne22](https://github.com/cpayne22/PinPayments)
 
 For more information about the examples below, you can visit https://pin.net.au/docs/api for a full reference.
-
-(Inspiration and thanks to Jayme Davis's Stripe implemetnation:  https://github.com/jaymedavis/stripe.net)
 
 Quick Start
 -----------
 
 a) Obtain either your Publish key or your Secret key (see the differences here: https://pin.net.au/docs/api)
 
-b) Update your AppSetting with your api key to your config (this is the easiest way)
+b) Put the following in appsettings.json:
 
-	<appSettings>
-	...
-		<add key="Secret_API" value="** ENTER YOUR SECRET API KEY **"/>
-	...
-	</appSettings>
-
+```json
+{
+  // [...] your other settings
+  // Put PinPayments section in
+  "PinPayments": {
+    "BaseUrl": "https://test-api.pin.net.au",
+    "ApiKey": "API_KEY_GOES_HERE"
+  }
+}
+```
 	
-c) In your application initialization, call (this is a programmatic way, but you only have to do it once during startup)
+c) In your application initialization, either
 
-	PinService ps = new PinService(ConfigurationManager.AppSettings["Secret_API"]);
+Option 1: Get configuration from config section:
 
-	or
-	
-	PinService ps = new PinService();
-	
+```csharp
+var builder = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
+// your other configurations
+IConfigurationRoot configuration = builder.Build();
+
+var options = new PinPaymentsOptions();
+configuration.GetSection("PinPayments").Bind(options);
+
+IPinService ps = new PinService(options);
+```
+
+Option 2: Use .NET Core's dependency injection:
+
+```csharp
+// in your Startup.cs
+using PinPayments.Extensions;
+
+
+/* This should come with a standard .NET Core ASP.NET Site */
+public Startup (IHostingEnvironment env) {
+    _currentEnvironment = env;
+
+    var builder = new ConfigurationBuilder ()
+        .SetBasePath (env.ContentRootPath)
+        .AddJsonFile ("appsettings.json", optional : true, reloadOnChange : true)
+        .AddJsonFile ($"appsettings.{env.EnvironmentName}.json", optional : true)
+        .AddEnvironmentVariables ();
+    Configuration = builder.Build ();
+}
+
+/* Then register the PinPayments service */
+public void ConfigureServices (IServiceCollection services) {
+    services.AddPinPayments(Configuration);
+}
+
+```
+
+Then in your controller, simply inject in `IPinService` in your constructor
 	
 Examples
 ========
+Working example for PinPayments are in the PinPayments.Console app. Simply:
+
+- Clone this repo.
+- Copy `PinPayments.Console\appsettings.json` to `appsettings.development.json` and set the correct details.
+- Perform a `dotnet restore` inside PinPayments.Console folder.
+- Run the sample console app: `dotnet run`.
 
 Charges
 -----
 
 ### Charging a card
 
-	PinService ps = new PinService(ConfigurationManager.AppSettings["Secret_API"]);
+	IPinService ps; // inject this
 
 	// https://pin.net.au/docs/api/test-cards
 	// 5520000000000000 - Mastercard
@@ -64,7 +110,7 @@ Charges
 ### Charge Search
 
 	// See https://pin.net.au/docs/api/charges#search-charges for more detail
-    PinService ps = new PinService(ConfigurationManager.AppSettings["Secret_API"]);
+	IPinService ps; // inject this
 
     var cs = new PinPayments.ChargeSearch { Query = "", Sort = ChargeSearchSortEnum.Amount, SortDirection = SortDirectionEnum.Descending };
     var response = ps.ChargesSearch(cs);
@@ -80,14 +126,16 @@ Customers
 
 ### Listing all customers
     // See https://pin.net.au/docs/api/customers#get-customers
-    ps = new PinService(ConfigurationManager.AppSettings["Secret_API"]);
+
+	IPinService ps; // inject this
     var customers = ps.Customers();
 	
 	
 ### Adding a new customer
 	
     // See https://pin.net.au/docs/api/customers#post-customers for more detail
-    ps = new PinService(ConfigurationManager.AppSettings["Secret_API"]);
+
+	IPinService ps; // inject this
 
     var customer = new Customer();
     customer.Email = "roland@pin.net.au";
@@ -112,7 +160,8 @@ Customers
 ### Updating a customer
 
     // See https://pin.net.au/docs/api/customers#put-customer
-    ps = new PinService(ConfigurationManager.AppSettings["Secret_API"]);
+
+	IPinService ps; // inject this
     var customers = ps.Customers();
     customer = customers.Customer[0];
     customer.Card = new Card();

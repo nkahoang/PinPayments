@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Newtonsoft.Json;
-using System.Web;
 
 namespace PinPayments
 {
@@ -16,7 +15,7 @@ namespace PinPayments
 
             var newUrl = url;
 
-            foreach (var property in obj.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+            foreach (var property in obj.GetType().GetTypeInfo().DeclaredProperties)
             {
                 foreach (var attribute in property.GetCustomAttributes(false))
                 {
@@ -48,7 +47,8 @@ namespace PinPayments
             {
                 token = "?";
             }
-            return string.Format("{0}{1}{2}={3}", url, token, argument, HttpUtility.UrlEncode(value));
+
+            return $"{url}{token}{argument}={System.Net.WebUtility.UrlEncode(value)}";
         }
     }
 }

@@ -1,27 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using PinPayments.Models;
+﻿using PinPayments.Models;
 using System.Net;
-using System.Configuration;
-using System.IO;
 using Newtonsoft.Json;
 using PinPayments.Infrastructure;
 using PinPayments.Actions;
+using Microsoft.Extensions.Options;
 
 namespace PinPayments
 {
-    public class PinService
+    public class PinService: IPinService
     {
-        public PinService()
+        PinPaymentsOptions _options;
+        Requestor _requestor;
+
+        public PinService(PinPaymentsOptions options)
         {
+            _options = options;
+            _requestor = new Requestor(_options);
+
+            Urls.BaseUrl = _options.BaseUrl;
         }
 
-        public PinService(string pinKey)
+        public PinService(IOptions<PinPaymentsOptions> options) : this(options.Value) { }
+
+        Requestor Requestor
         {
-            PinPaymentsConfig.SetApiKey( pinKey);
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
+            get
+            {
+                return _requestor;
+            }
         }
 
         public CardCreateResponse CardCreate(Card c)
@@ -55,7 +61,7 @@ namespace PinPayments
         {
             var url = Urls.Charges + token;
             var response = Requestor.GetString(url);
-
+            
             var result = JsonConvert.DeserializeObject<ChargeDetail>(response);
             return result;
         }
@@ -83,9 +89,9 @@ namespace PinPayments
             {
                 throw new PinException(HttpStatusCode.BadRequest, null, "You need to supply either the Card, the Customer Token or a Card Token for payment");
             }
+
             var response = Requestor.PostString(url, postData);
             return JsonConvert.DeserializeObject<ChargeResponse>(response);
-
         }
 
         public Charges ChargesSearch(ChargeSearch cs)
