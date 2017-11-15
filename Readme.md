@@ -6,6 +6,12 @@ This was a fork on the [original repo by cpayne22](https://github.com/cpayne22/P
 
 For more information about the examples below, you can visit https://pin.net.au/docs/api for a full reference.
 
+Sponsors
+-----------
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/x9qjRr8kJ9ep7eSNPnjQQPNM/nkahoang/PinPayments'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/x9qjRr8kJ9ep7eSNPnjQQPNM/nkahoang/PinPayments.svg' />
+</a>
+
 Quick Start
 -----------
 
@@ -226,8 +232,6 @@ Customers
     response = ps.Charge(new PostCharge { Amount = 1500, CardToken = card.Token, Currency = "AUD", Description = "Desc", Email = "email@test.com", IPAddress = "127.0.0.1" });
     System.Console.WriteLine(response.Error); // "token_already_used"
     System.Console.WriteLine(response.Description); // "Token already used. Card tokens can only be used once, to create a charge or assign a card to a customer."
-	
-	
 	
 Errors
 ------
